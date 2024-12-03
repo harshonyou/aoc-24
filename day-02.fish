@@ -46,3 +46,48 @@ end
 
 # part-one
 echo "part-one: $count"
+
+
+function one-off
+  set report $argv[1]
+
+  set length (echo $report | awk '{print NF}') 
+  set valid 0
+
+  for i in (seq 1 $length)
+    set arr
+    
+    for j in (seq 1 $length)
+      if not test $i -eq $j
+        set -a arr (echo $report | awk "{print \$$j}")
+      end
+    end
+
+    safety-check (string join ' ' $arr)
+
+    set valid (math $valid + $status)
+
+    if test $valid -ge 1
+      return 1
+    end
+  end
+
+  return 0
+end
+
+
+set count 0
+
+for report in $reports
+  safety-check $report
+  set safety_status $status
+  set count (math $count + $safety_status)
+
+  if test $safety_status -ne 1
+    one-off $report
+    set count (math $count + $status)
+  end
+end
+
+# part-two
+echo "part-two: $count"
